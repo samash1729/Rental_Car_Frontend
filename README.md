@@ -10,4 +10,6 @@ The Front end has been built using Bootstrap and ReactJS. Design is responsive. 
 \menu - All transactions can be viewed.
 \bookacar - Booking page opened once you select car in home page.
 
+Some cars have already been added for convenience.
+
 Any doubts? Contact me at 9871450094.
