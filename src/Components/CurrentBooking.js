@@ -13,7 +13,8 @@ class Booking extends Component{
     }
 
     TransactionListOut(){
-        fetch('http://18.191.175.227:3000/transactions').then(response => response.json()).then(data =>  {
+        var proxyUrl = 'https://cors-anywhere.herokuapp.com/'
+        fetch(proxyUrl+'http://18.191.175.227:3000/transactions').then(response => response.json()).then(data =>  {
             const totalContent = data.length;
             if(totalContent === 0){
                 alert("No Transactions available!");

@@ -101,7 +101,8 @@ class Book extends Component{
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(query)
         };
-        fetch('http://18.191.175.227:3000/transactions', requestOptions)
+        var proxyUrl = 'https://cors-anywhere.herokuapp.com/'
+        fetch(proxyUrl+'http://18.191.175.227:3000/transactions', requestOptions)
         .then(response => {
             const contentType = response.headers.get("content-type");
             if (contentType && contentType.indexOf("application/json") !== -1){

@@ -128,9 +128,10 @@ class ListPage extends Component{
             }
             query["seatingCap"] = this.state.seatingCapacity;
         }
+        var proxyUrl = 'https://cors-anywhere.herokuapp.com/'
         var url = new URL('http://18.191.175.227:3000/searches')
         url.search = new URLSearchParams(query).toString();
-       fetch(url,{
+       fetch(proxyUrl+url,{
            method:"GET"
        }).then(response => response.json()).then(data =>  {
            const totalContent = data.length;
