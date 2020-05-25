@@ -128,7 +128,7 @@ class ListPage extends Component{
             }
             query["seatingCap"] = this.state.seatingCapacity;
         }
-        var url = new URL('http://localhost:3000/searches')
+        var url = new URL('http://18.191.175.227:3000/searches')
         url.search = new URLSearchParams(query).toString();
        fetch(url,{
            method:"GET"

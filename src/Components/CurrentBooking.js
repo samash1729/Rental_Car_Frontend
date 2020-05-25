@@ -13,7 +13,7 @@ class Booking extends Component{
     }
 
     TransactionListOut(){
-        fetch('http://localhost:3000/transactions').then(response => response.json()).then(data =>  {
+        fetch('http://18.191.175.227:3000/transactions').then(response => response.json()).then(data =>  {
             const totalContent = data.length;
             if(totalContent === 0){
                 alert("No Transactions available!");

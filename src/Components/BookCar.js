@@ -101,7 +101,7 @@ class Book extends Component{
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(query)
         };
-        fetch('http://localhost:3000/transactions', requestOptions)
+        fetch('http://18.191.175.227:3000/transactions', requestOptions)
         .then(response => {
             const contentType = response.headers.get("content-type");
             if (contentType && contentType.indexOf("application/json") !== -1){
