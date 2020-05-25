@@ -12,4 +12,6 @@ The Front end has been built using Bootstrap and ReactJS. Design is responsive. 
 
 Some cars have already been added for convenience.
 
+The project uses alert to show prompts to users. Due to the blocking nature of alerts, some api calls like loading cars in home isn't working in safari and mozilla. But the website is fully functional in Chrome. Please run the project in Chrome. Since this was my first ever project and I did all the development in chrome I wasn't aware of this issue,.
+
 Any doubts? Contact me at 9871450094.
