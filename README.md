@@ -17,6 +17,6 @@ Individual Pages:
 
 Some cars have already been added for convenience.
 
-Works in all browser :)
+Works in all browsers :)
 
 Any doubts? Contact me at 9871450094.
