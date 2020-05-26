@@ -96,6 +96,9 @@ class Book extends Component{
           })
         }
         this.result["carName"] = this.result["carName"].replace(/[+]/g,' ');
+        this.result["model"] = this.result["model"].replace(/[+]/g,' ');
+        this.result["color"] = this.result["color"].replace(/[+]/g,' ');
+        this.result["vehicleNo"] = this.result["vehicleNo"].replace(/[+]/g,' ');
         this.carFixedRate = this.result["price"];
         this.setState({
             totalPrice:this.carFixedRate
