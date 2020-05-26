@@ -8,10 +8,8 @@
   .react-datepicker__input-container input {
     display: block;
     width: 100%;
-    
   }
-
-
+  
   .center {
     display: flex;
     justify-content: center;

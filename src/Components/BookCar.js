@@ -3,7 +3,10 @@ import Header from './headerComponent';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Redirect } from 'react-router-dom';
 import { Button, Form, FormGroup, Label, Input, Col,  FormFeedback } from 'reactstrap';
-
+import DatePicker from 'react-datepicker';
+import addDays from 'date-fns/addDays'
+import "react-datepicker/dist/react-datepicker.css";
+import './styles.css'
 class Book extends Component{
 
     constructor(props){
@@ -11,7 +14,13 @@ class Book extends Component{
         this.state = {
             redirect: false,
             phoneNo:'',
+            loadingTitle: 'Book a Car',
             name:'',
+            startDate: new Date(),
+            endDate: addDays(new Date(),1),
+            startDateString: (new Date()).toISOString(),
+            endDateString: addDays(new Date(),1).toISOString(),
+            totalPrice:'',
             touched:{
                 name:false,
                 phoneNo:false
@@ -19,12 +28,12 @@ class Book extends Component{
         };
         this.result = {};
         this.q = '';
-        this.startDate = new Date();
-        this.endDate = new Date();
-        this.days = '';
         this.makeTransaction = this.makeTransaction.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
+        this.handleStartDateChange = this.handleStartDateChange.bind(this);
+        this.handleEndDateChange = this.handleEndDateChange.bind(this);
+        this.carFixedRate = '';
     }
 
     handleBlur = (field) => (evt) =>{
@@ -32,6 +41,24 @@ class Book extends Component{
             touched: {...this.state.touched,[field]:true}
         })
     } 
+
+    handleStartDateChange(date){
+        this.setState({
+            startDate: date,
+            startDateString: String(date.toISOString()),
+            endDate: addDays(date,1),
+            endDateString: addDays(date,1).toISOString(),
+            totalPrice:this.carFixedRate
+        })
+    }
+
+    handleEndDateChange(date){
+        this.setState({
+            endDate: date,
+            endDateString: date.toISOString(),
+            totalPrice: String( Math.ceil((date.getTime() - this.state.startDate.getTime())/(3600*24*1000)) * parseFloat(this.carFixedRate))
+        })
+    }
 
     validate(name,phoneNo){
         const errors = {
@@ -68,18 +95,27 @@ class Book extends Component{
                }
           })
         }
-        this.result["issueDate"] = this.result["issueDate"].replace(/%3A/g,":");
-        this.result["returnDate"] = this.result["returnDate"].replace(/%3A/g,":");
-        this.startDate = new Date(this.result["issueDate"]);
-        this.endDate = new Date(this.result["returnDate"]);
-        this.result["carName"] = this.result["carName"].replace('+',' ');
-        this.result["price"] = Math.ceil((this.endDate.getTime() - this.startDate.getTime())/(3600*24*1000)) * parseFloat(this.result["price"]);
+        this.result["carName"] = this.result["carName"].replace(/[+]/g,' ');
+        this.carFixedRate = this.result["price"];
+        this.setState({
+            totalPrice:this.carFixedRate
+        })
       }
 
     makeTransaction(){
         var query = {};
-        query["issueDate"] = this.result["issueDate"];
-        query["returnDate"] = this.result["returnDate"];
+
+        if(this.state.startDateString < (new Date().toISOString())){
+            alert("Start Date and Time Set to past. Please update");
+            return;
+        }
+        if(this.state.startDateString >= this.state.endDateString){
+            alert("Start Date must be less than end date");
+            return;
+        }
+        query["issueDate"] = this.state.startDateString;
+        query["returnDate"] = this.state.endDateString;
+
         query["vehicleNo"] = this.result["vehicleNo"];
 
         if(this.state.name.length <3 || this.state.name.length>20){
@@ -96,6 +132,9 @@ class Book extends Component{
 
         query["name"] = this.state.name.toString();
         query["phoneNo"] = this.state.phoneNo.toString();
+        this.setState({
+            loadingTitle: "Transaction In Progress..."
+        });
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -114,7 +153,10 @@ class Book extends Component{
                   });
             }
             else{
-                return response.text().then(data => alert(data));
+                return response.text().then(data => alert("Transaction Unsuccessful" + "\n" + "Reason: " + data),
+                this.setState({
+                    loadingTitle:'Book a Car'
+                }));
             }
         });
     }
@@ -127,6 +169,10 @@ class Book extends Component{
           [name]: value
         });
     }
+
+    componentDidMount(){
+        this.CarInfo();
+    }
     
 
     render(){
@@ -134,15 +180,13 @@ class Book extends Component{
         if(this.state.redirect){
             return <Redirect to='/home'/>;
         }
-
-        this.CarInfo();
         const errors = this.validate(this.state.name,this.state.phoneNo);
 
         return(
             <React.Fragment>            
                 <Header/>
                 <div className="container" style={{backgroundColor:'#F2F2F2'}}>
-                    <h3><center>Book a Car</center></h3>
+                    <h3><center>{this.state.loadingTitle}</center></h3>
                     <div className="row mt-5">
                         <div className= "col-12 col-lg-4">
                             <table className="table table-condensed table-bordered">
@@ -191,7 +235,7 @@ class Book extends Component{
                                         Total Price
                                     </td>
                                     <td>
-                                        Rs. {this.result["price"]}
+                                        Rs. {this.state.totalPrice}
                                     </td>
                                 </tr>
                                 <tr>
@@ -200,22 +244,6 @@ class Book extends Component{
                                     </td>
                                     <td>
                                         {this.result["seatingCap"]}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Start Date
-                                    </td>
-                                    <td>
-                                        {this.startDate.toDateString()}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        End Date
-                                    </td>
-                                    <td>
-                                        {this.endDate.toDateString()}
                                     </td>
                                 </tr>
                             </table>
@@ -252,6 +280,44 @@ class Book extends Component{
                                                 </FormFeedback>
                                         </Col>
                                     </FormGroup>
+                                    <FormGroup row>
+                                        <Label  className="h3" htmlFor="startDate" lg={8}>Start Date</Label>
+                                    </FormGroup>
+                                    <FormGroup row>
+                                        <Col lg={8}>
+                                            <DatePicker className="border border-secondary"
+                                                name="startDate"
+                                                selected={ this.state.startDate }
+                                                onChange={ this.handleStartDateChange }
+                                                showTimeSelect
+                                                timeFormat="HH:mm"
+                                                timeIntervals={20}
+                                                timeCaption="time"
+                                                dateFormat="MMMM d, yyyy h:mm aa"
+                                                minDate={new Date()}
+                                                maxDate={addDays(new Date(), 365)}
+                                            />
+                                        </Col>
+                                    </FormGroup>
+                                    <FormGroup row>
+                                        <Label  className="h3" htmlFor="endDate" lg={8}>End Date</Label>
+                                    </FormGroup>
+                                    <FormGroup row>
+                                        <Col lg={8}>
+                                            <DatePicker className="border border-secondary"
+                                                name="endDate"
+                                                selected={ this.state.endDate }
+                                                onChange={ this.handleEndDateChange }
+                                                showTimeSelect
+                                                timeFormat="HH:mm"
+                                                timeIntervals={20}
+                                                timeCaption="time"
+                                                dateFormat="MMMM d, yyyy h:mm aa"
+                                                minDate={addDays(this.state.startDate,1)}
+                                                maxDate={addDays(this.state.startDate, 365)}
+                                            />
+                                        </Col>
+                                </FormGroup>
                                 </Form>
                         <Button onClick={this.makeTransaction}>
                                 MAKE TRANSACTION
